@@ -1,19 +1,29 @@
 version: '3'
 
 services:
-  lb-demo:
+  flask-socketio-load-balancing-redis:
+    image: redis:latest
+    container_name: flask-socketio-load-balancing-redis
+    restart: always
+    ports:
+      - "6379"
+        
+  api:
     build:
       context: .
-
+    # container_name: flask-socketio-load-balancing-api
+    depends_on:
+      - flask-socketio-load-balancing-redis
     ports:
-      - "5000"
+      - "5003"
 
-  nginx-load-balancer:
+  flask-socketio-load-balancing-nginx:
     image: nginx:latest
+    container_name: flask-socketio-load-balancing-nginx
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
     depends_on:
-      - lb-demo
+      - api
     ports:
-      - "3514:3514"
+      - "5003:5003"
