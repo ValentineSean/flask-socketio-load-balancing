@@ -14,21 +14,25 @@ from redis_pub_sub.subscriber import subscribe
 
 app = Flask(__name__)
 # socketio = SocketIO(logger=True, engineio_logger=True, message_queue="redis://0.0.0.0:5002")
-socketio = SocketIO(logger=True, engineio_logger=True)
+socketio = SocketIO(logger=True, engineio_logger=True, message_queue="redis://flask-socketio-load-balancing-redis:6379")
 
 socketio.init_app(app)
 
-# REDIS CONNECTION
-r = redis.Redis(
-    host="flask-socketio-load-balancing-redis",
-    port=6379,
-    decode_responses=True
-)
+# # REDIS CONNECTION
+# r = redis.Redis(
+#     host="flask-socketio-load-balancing-redis",
+#     port=6379,
+#     decode_responses=True
+# )
 
 # HTTP
 @app.route("/home")
 def home():
     print("shall we play a game...")
+    redis_channel = "DEFCON-2"
+    server_address = socket.gethostname()
+
+
     return f"Container ID: {socket.gethostname()}"
 
 # Command to fire up containers: 'docker-compose up -d --force-recreate --build --scale [SERVICE_NAME]=3 --remove-orphans'
@@ -71,13 +75,13 @@ def socket_home(data):
         "server_address": server_address,
         "client_os": client_os,
     }
-    publish(redis_channel=redis_channel, data=data)
+    # publish(redis_channel=redis_channel, data=data)
 
     # # REDIS SUBSCRIBE
-    subscriber_message = subscribe(redis_channel)
+    # subscriber_message = subscribe(redis_channel)
 
-    # socketio.emit("home-response", f">SERVER ADDRESS: {server_address}, CLIENT OS: {client_os}")
-    socketio.emit("home-response", subscriber_message)
+    socketio.emit("home-response", f">SERVER ADDRESS: {server_address}, CLIENT OS: {client_os}")
+    # socketio.emit("home-response", subscriber_message)
 
 
 if __name__ == "__main__":
