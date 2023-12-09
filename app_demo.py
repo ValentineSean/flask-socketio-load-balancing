@@ -1,9 +1,16 @@
 import socket
 
-from flask_socketio import emit, join_room
-from config.socket import socketio
+from flask import Flask
+from flask_cors import CORS
+from flask_socketio import SocketIO
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
 
-# WEBSOCKET
+app_demo = Flask(__name__)
+CORS(app_demo)
+socketio = SocketIO(logger=True, engineio_logger=True)
+socketio.init_app(app_demo)
+
 @socketio.on("join-room")
 def join_room(data):
     server_address = socket.gethostname()
@@ -24,3 +31,8 @@ def join_room(data):
     # emit("join-room-response", data)
     # socketio.emit("join-room-response", data, to=room_name)
     socketio.emit("join-room-response", data)
+
+if __name__ == "__main__":
+    pywsgi.WSGIServer(("", 5009), app_demo,
+        handler_class=WebSocketHandler
+    ).serve_forever()
