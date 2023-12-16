@@ -11,7 +11,6 @@ services:
   api:
     build:
       context: .
-    # container_name: flask-socketio-load-balancing-api
     depends_on:
       - flask-socketio-load-balancing-redis
     ports:

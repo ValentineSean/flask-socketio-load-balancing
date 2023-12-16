@@ -20,8 +20,8 @@ CORS(app)
 
 def create_app():
     # SocketIO
-    # socketio.init_app(app, cors_allowed_origin="*")
-    socketio.init_app(app, cors_allowed_origins=["http://localhost:6001", "*"], message_queue="redis://flask-socketio-load-balancing-redis:6379")
+    # socketio.init_app(app, cors_allowed_origins=["http://localhost:6001"])
+    socketio.init_app(app, cors_allowed_origins=["http://localhost:6001"], message_queue="redis://flask-socketio-load-balancing-redis:6379")
     return app
 
 app = create_app()
